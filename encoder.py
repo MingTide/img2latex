@@ -14,7 +14,7 @@ class Encoder(nn.Module):
         self._config = config
 
         # Define the convolutional layers
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
+        self.conv1 = nn.Conv2d(1, 64, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
         self.conv3 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
         self.conv4 = nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1)
@@ -34,6 +34,7 @@ class Encoder(nn.Module):
             the encoded images, shape = (B, C', H', W')
         """
         # Normalize input to [0, 1]
+        img = img.permute(0, 3, 1, 2)
         img = img / 255.0
 
         # First conv + max pool
@@ -68,7 +69,7 @@ class Encoder(nn.Module):
 
         # Add positional embeddings if enabled
         if self._config.positional_embeddings:
-            out = self.add_timing_signal_nd(out)
+            out = add_timing_signal_nd(out)
 
         return out
 

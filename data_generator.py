@@ -81,21 +81,21 @@ class DataGenerator(object):
         self._iter_mode = "full"
 
         # iterate over the dataset in "full" mode and create buckets
-        data_buckets = dict() # buffer for buckets
+        data_buckets_dict = dict() # buffer for buckets
         for idx, (img, formula, img_path, formula_id) in enumerate(self):
             s = img.shape
-            if s not in data_buckets:
-                data_buckets[s] = []
+            if s not in data_buckets_dict:
+                data_buckets_dict[s] = []
             # if bucket is full, write it and empty it
-            if len(data_buckets[s]) == bucket_size:
-                for (img_path, formula_id) in data_buckets[s]:
+            if len(data_buckets_dict[s]) == bucket_size:
+                for (img_path, formula_id) in data_buckets_dict[s]:
                     bucketed_dataset += [(img_path, formula_id)]
-                data_buckets[s] = []
+                data_buckets_dict[s] = []
 
-            data_buckets[s] += [(img_path, formula_id)]
+            data_buckets_dict[s] += [(img_path, formula_id)]
 
         # write the rest of the buffer
-        for k, v in data_buckets.items():
+        for k, v in data_buckets_dict.items():
             for (img_path, formula_id) in v:
                 bucketed_dataset += [(img_path, formula_id)]
 
@@ -175,12 +175,7 @@ class DataGenerator(object):
         img = imread(self._dir_images + "/" + img_path)
         img = self._img_prepro(img)
 
-        # 保存图片
-        plt.figure(figsize=(8, 6))
-        plt.imshow(img)  # 使用'gray'颜色映射显示灰度图
-        plt.title("灰度图像")
-        plt.axis('off')  # 关闭坐标轴
-        plt.show()
+
 
         formula = self._form_prepro(self._get_raw_formula(formula_id))
 

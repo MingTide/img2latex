@@ -1,9 +1,12 @@
 import click
+import torch
 
 from data_generator import DataGenerator
 from general import Config, minibatches
 from model.utils.image import greyscale
 from text import Vocab
+from encoder import Encoder
+import numpy as np
 
 
 @click.command()
@@ -28,8 +31,11 @@ def main(data, vocab, training, model, output):
             max_len=config.max_length_formula,
             form_prepro=vocab.form_prepro)
     batch_size = config.batch_size
+    res  = []
     for i, (img, formula) in enumerate(minibatches(train_set, batch_size)):
-        print(formula)
-        print(img)
+        res.append(img)
+    encoder = Encoder(config)
+
+    print(encoder.forward(torch.tensor(res[0])))
 if __name__ == "__main__":
     main()
