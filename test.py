@@ -1,24 +1,19 @@
-import numpy as np
-import matplotlib.pyplot as plt
+import torch
+import torch.nn as nn
 
-min_timescale = 1.0
-max_timescale = 10000.0
-num_timescales = 6
 
-log_increment = np.log(max_timescale / min_timescale) / (num_timescales - 1)
-inv_timescales = min_timescale * np.exp(-np.arange(num_timescales) * log_increment)
+class MyModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # 创建一个 3 维的可训练向量
+        self.my_param = nn.Parameter( torch.tensor([1.0, 2.0, 3.0]))
 
-positions = np.arange(0, 100)
+    def forward(self, x):
+        # 模拟参数参与计算
+        return x + self.my_param
 
-plt.figure(figsize=(10, 5))
-for i, inv_ts in enumerate(inv_timescales):
-    # 画出 sin 的波形
-    signal = np.sin(positions * inv_ts)
-    plt.plot(positions, signal, label=f"timescale {i}\n(inv={inv_ts:.4f})")
 
-plt.title("不同 timescale 下的位置编码正弦波")
-plt.xlabel("position")
-plt.ylabel("sin(position * inv_timescale)")
-plt.legend()
-plt.grid()
-plt.show()
+model = MyModel()
+x = torch.tensor([1.0, 2.0, 3.0])
+output = model(x)
+print("输出:", output)

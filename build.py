@@ -2,7 +2,7 @@ import click
 
 from data_generator import DataGenerator
 from general import Config
-from text import build_vocab, write_vocab
+from model.utils.text import build_vocab, write_vocab
 
 
 @click.command()

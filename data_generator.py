@@ -1,10 +1,9 @@
 from imageio.v3 import imread
-from matplotlib import pyplot as plt
 
 from general import init_dir
 from model.utils.image import build_images
-from text import load_formulas
-from PIL import Image
+from model.utils.text import load_formulas
+
 
 class DataGenerator(object):
     """Data Generator of tuple (image, formula)"""

@@ -39,9 +39,19 @@ def add_timing_signal_nd(x, min_timescale=1.0, max_timescale=1.0e4):
         prepad = dim * 2 * num_timescales
         postpad = channels - (dim + 1) * 2 * num_timescales
         if prepad + postpad > 0:
+            """
+                创建一个4D张量 (batch_size, channels, height, width)
+                x = torch.ones(1, 1, 3, 3)
+                在宽度维度上每侧填充2个单位，在高度维度上每侧填充1个单位，使用默认的0填充
+                result = torch.nn.functional.pad(x, pad=(2, 2,1,1), mode='constant', value=0)
+            """
             signal = torch.nn.functional.pad(signal, (prepad, postpad))
 
         # expand to match the shape of x
+        """
+        矩阵 * 常数
+        [1] * 4 -> [1, 1, 1, 1]
+        """
         shape = [1, channels] + [1] * num_dims
         shape[dim + 2] = length
         signal = signal.view(shape)
@@ -49,3 +59,28 @@ def add_timing_signal_nd(x, min_timescale=1.0, max_timescale=1.0e4):
         x = x + signal
 
     return x
+
+if __name__ == '__main__':
+    import torch
+
+    # 创建一个3x4的张量
+    x = torch.randn(3, 4)
+    print("Original tensor:\n", x)
+    # 创建一个3x4的张量
+    y= x.view(4, 3)
+    print("Original tensor:\n", y)
+    # 将其变更为1x12的张量
+    y = x.view(1, 12)
+    print("\nReshaped to 1x12:\n", y)
+    y = x.view(12, 1)
+    print("\nReshaped to 1x12:\n", y)
+
+    # 使用-1让PyTorch自动计算合适的维度大小
+    z = x.view(-1, 6)  # 自动计算第一个维度的大小为2
+    print("\nReshaped to 2x6 using -1:\n", z)
+
+    # 如果尝试变更成元素数量不符的形状将会报错
+    try:
+        x.view(12, 1)  # 这将抛出一个运行时错误
+    except RuntimeError as e:
+        print("\nError:", e)

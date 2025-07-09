@@ -2,11 +2,12 @@ import click
 import torch
 
 from data_generator import DataGenerator
+from decoder import Decoder
 from general import Config, minibatches
-from model.utils.image import greyscale
-from text import Vocab
+from img2seq import Img2SeqModel
+from model.utils.image import greyscale, pad_batch_images
+from model.utils.text import Vocab, pad_batch_formulas
 from encoder import Encoder
-import numpy as np
 
 
 @click.command()
@@ -33,9 +34,17 @@ def main(data, vocab, training, model, output):
     batch_size = config.batch_size
     res  = []
     for i, (img, formula) in enumerate(minibatches(train_set, batch_size)):
-        res.append(img)
-    encoder = Encoder(config)
+        my_dict = {
+            'img': pad_batch_images(img),
+            'formula':pad_batch_formulas(formula,
+                    vocab.id_pad, vocab.id_end)
+        }
+        res.append(my_dict)
 
-    print(encoder.forward(torch.tensor(res[0])))
+    encoder = Encoder(config)
+    encoder_img = encoder(torch.tensor(res[0]['img']))
+    decoder = Decoder(config, vocab.n_tok, vocab.id_end)
+    decoder(encoder_img,torch.tensor(res[0]['formula'][0]))
+
 if __name__ == "__main__":
     main()
